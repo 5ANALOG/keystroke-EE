@@ -8,8 +8,7 @@ import java.io.IOException;
 import java.io.File;
 
 public class exportUser {
-    private String csvFile = "/Users/shawn/Documents/keystrokeEE/data/";
-
+    private String csvFile = "./data/";
 
     public boolean writeCSV(trialList userTrial, String id) {
         final String COMMA = ",";

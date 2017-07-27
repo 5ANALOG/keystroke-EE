@@ -1,6 +1,7 @@
 package keyInterface;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -72,7 +73,6 @@ public class keyGUI extends JFrame implements ActionListener{
         trial_Label = new JLabel("Num. of Trial : " + num_trial);
 
         displayArea = new JLabel("Hi, please type your designated userID and a given userPW below");
-
         typingArea = new JTextArea(20,20);
         scroll = new JScrollPane(typingArea);
         typingArea.setWrapStyleWord(true);
@@ -185,6 +185,10 @@ public class keyGUI extends JFrame implements ActionListener{
     }
 
     private void nextTrial(){
+        if (num_trial >= 15){
+            displayArea.setText("15 Trials done. Please export the trial");
+            return;
+        }
         if (typingArea.getText().equals(input)) {
             num_trial++;
             TrialList.add(KeyList);
@@ -226,7 +230,6 @@ public class keyGUI extends JFrame implements ActionListener{
 
     public void openModel(){
         model Model = new model();
-        importUser user = new importUser();
     }
 
     public ChartPanel createChart(String chartTitle, trialList trialData, int chartType) {
