@@ -2,9 +2,12 @@ package utility;
 
 
 public class User {
+    private final int TRIAL_NUM = 15;
+    private final int DWELL_NUM = 14;
+    private final int FLIGHT_NUM = DWELL_NUM-1;
     private String userID;
-    public int[][] dwell = new int[15][14]; // 15 trials, 14 dwell time each
-    public int[][] flight = new int[15][13]; //15 trials, 13 flight time each
+    public int[][] dwell = new int[TRIAL_NUM][DWELL_NUM]; // 15 trials, 14 dwell time each
+    public int[][] flight = new int[TRIAL_NUM][FLIGHT_NUM]; //15 trials, 13 flight time each
 
     public void setuserID(String ID){
         this.userID = ID;

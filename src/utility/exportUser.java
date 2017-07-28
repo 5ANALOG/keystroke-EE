@@ -1,7 +1,7 @@
 package utility;
 
-import keyInterface.*;
-
+import keyInterface.trialList;
+import keyInterface.keyList;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.io.File;
 
 public class exportUser {
     private String csvFile = "./data/";
-
     public boolean writeCSV(trialList userTrial, String id) {
         final String COMMA = ",";
         final String NEW_LINE = "\n";
@@ -56,7 +55,7 @@ public class exportUser {
                 }
             } catch (IOException e) {
                 System.out.println("Error during flushing");
-                System.out.println(e);
+                e.printStackTrace();
             }
         }
         return true;

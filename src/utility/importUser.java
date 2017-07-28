@@ -8,6 +8,10 @@ import java.util.ArrayList;
 
 
 public class importUser {
+    private final int TRIAL_NUM = 15;
+    private final int DWELL_NUM = 14;
+    private final int FLIGHT_NUM = DWELL_NUM-1;
+
     private String csvFile = "./data/";
     private ArrayList<User> userList = new ArrayList<User>();
 
@@ -18,7 +22,6 @@ public class importUser {
     public ArrayList<User> getuserList(){
         return this.userList;
     }
-
     public void readCSV() {
         final String COMMA = ",";
         BufferedReader fileReader = null;
@@ -35,20 +38,15 @@ public class importUser {
 
                 user.setuserID(part[0]); //Import username
                 System.out.println("------"+part[0]+"------");
-                for (int i = 0; i < 15; i++) { // for 10 trials
-                    System.out.println("Dwell Time");
-                    for (int j = 0; j < 14; j++) { //Import dwell time data
-                        System.out.print(part[j + 2]+ " ");
+                for (int i = 0; i < TRIAL_NUM; i++) { // for 15 trials
+                    for (int j = 0; j < DWELL_NUM; j++) { //Import dwell time data
                         user.setdwell(i, j, Integer.parseInt(part[j + 2]));
                     }
-                    System.out.println("\nFlight TIme");
-                    for (int j = 0; j < 13; j++) { //Import flight time data
-                        System.out.print(part[16+j]+" ");
-                        user.setflight(i, j, Integer.parseInt(part[16 + j]));
+                    for (int j = 0; j < FLIGHT_NUM; j++) { //Import flight time data
+                        user.setflight(i, j, Integer.parseInt(part[2+DWELL_NUM+j]));
                     }
                     line = fileReader.readLine();
                     if(line!= null) part = line.split(COMMA);
-                    System.out.println();
                 }
                 userList.add(user);
             }

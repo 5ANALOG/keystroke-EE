@@ -1,7 +1,6 @@
 package keyInterface;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -18,15 +17,12 @@ public class keyGUI extends JFrame implements ActionListener{
     private keyList KeyList;
     private trialList TrialList;
 
-    private JPanel pane = new JPanel(new GridLayout(1,2));
-    private JPanel pane2 = new JPanel(new GridLayout(10,1));
-    private JPanel pane3 = new JPanel(new FlowLayout());
-    private JPanel pane4 = new JPanel(new GridLayout(2,1));
+    private JPanel chartPane = new JPanel(new GridLayout(2,1));
 
     private JTextField userID;
     private JTextArea typingArea;
-    private JLabel userID_Label, fixedPhrase_Label, trial_Label, displayArea;
-    private JScrollPane scroll;
+    private JLabel trial_Label;
+    private JLabel displayArea;
 
     private JButton submitButton, clearButton, exportButton, newTrialButton, modelButton;
 
@@ -38,52 +34,23 @@ public class keyGUI extends JFrame implements ActionListener{
 
     private Boolean exported = false;
 
-
-    private keyGUI(){
+    private keyGUI(){ //KEY GUI Constructor
+        //Frame information
         super("Key Collector");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setSize(900,600);
 
-        pane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-
+        //Create KeyList and TrialList object
         KeyList = new keyList();
         TrialList = new trialList();
 
-        clearButton = new JButton("New user");
-        clearButton.addActionListener(this);
+        JPanel recordPane = new JPanel(new GridLayout(1, 2));
+        recordPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-        exportButton = new JButton("Export data");
-        exportButton.addActionListener(this);
-
-        newTrialButton = new JButton("New trial");
-        newTrialButton.addActionListener(this);
-
-        submitButton = new JButton("Sign in");
-        submitButton.addActionListener(this);
-
-
-        modelButton = new JButton("Model Analysis");
-        modelButton.addActionListener(this);
-
-        userID_Label = new JLabel("User ID: ");
-        userID = new JTextField(15);
-
-        fixedPhrase_Label = new JLabel("(User PW) Your password is:  "+ input);
-        trial_Label = new JLabel("Num. of Trial : " + num_trial);
-
-        displayArea = new JLabel("Hi, please type your designated userID and a given userPW below");
-        typingArea = new JTextArea(20,20);
-        scroll = new JScrollPane(typingArea);
-        typingArea.setWrapStyleWord(true);
-        typingArea.setAutoscrolls(true);
-        typingArea.setLineWrap(true);
 
         //Key monitor class implemented inner class.
         KeyAdapter keyMonitor = new KeyAdapter(){
-            public void keyTyped(){
-            //Not using it.
-            }
             public void keyPressed(KeyEvent event){
                 int key = event.getKeyCode();
                 if (key == KeyEvent.VK_BACK_SPACE || key == KeyEvent.VK_TAB){
@@ -121,34 +88,58 @@ public class keyGUI extends JFrame implements ActionListener{
             }
         };
 
-        typingArea.addKeyListener(keyMonitor);
-
         chart1 = createChart("Dwell", TrialList, 0);
         chart2 = createChart("Flight", TrialList, 1);
-
         chart1.setVisible(true);
         chart2.setVisible(true);
+        chartPane.add(chart1);
+        chartPane.add(chart2);
 
-        pane4.add(chart1);
-        pane4.add(chart2);
 
-        pane2.add(displayArea);
-        pane2.add(userID_Label);
-        pane2.add(userID);
-        pane2.add(fixedPhrase_Label);
-        pane2.add(typingArea);
-        pane2.add(submitButton);
-        pane2.add(trial_Label);
-        pane3.add(newTrialButton);
-        pane3.add(clearButton);
-        pane3.add(exportButton);
-        pane3.add(modelButton);
-        pane2.add(pane3);
-        pane.add(pane2);
-        pane.add(pane4);
+        JPanel loginPane = new JPanel(new GridLayout(10, 1));
+        JLabel userID_Label = new JLabel("User ID: ");
+        userID = new JTextField(15);
+        JLabel fixedPhrase_Label = new JLabel("(User PW) Your password is:  " + input);
+        trial_Label = new JLabel("Num. of Trial : " + num_trial);
+        displayArea = new JLabel("Hi, please type your designated userID and a given userPW below");
+        typingArea = new JTextArea(20,20);
+        typingArea.setWrapStyleWord(true);
+        typingArea.setAutoscrolls(true);
+        typingArea.setLineWrap(true);
+        loginPane.add(displayArea);
+        loginPane.add(userID_Label);
+        loginPane.add(userID);
+        loginPane.add(fixedPhrase_Label);
+        loginPane.add(typingArea);
 
-        this.add(pane);
+
+        JPanel buttonPane = new JPanel(new FlowLayout());
+        clearButton = new JButton("New user");
+        clearButton.addActionListener(this);
+        exportButton = new JButton("Export data");
+        exportButton.addActionListener(this);
+        newTrialButton = new JButton("New trial");
+        newTrialButton.addActionListener(this);
+        submitButton = new JButton("Sign in");
+        submitButton.addActionListener(this);
+        modelButton = new JButton("Model Analysis");
+        modelButton.addActionListener(this);
+        buttonPane.add(newTrialButton);
+        buttonPane.add(clearButton);
+        buttonPane.add(exportButton);
+        buttonPane.add(modelButton);
+
+        loginPane.add(submitButton);
+        loginPane.add(trial_Label);
+
+        loginPane.add(buttonPane);
+        recordPane.add(loginPane);
+        recordPane.add(chartPane);
+        this.add(recordPane);
         this.setVisible(true);
+
+        //Add keyMonitor listener to typing area
+        typingArea.addKeyListener(keyMonitor);
     }
 
     public  void actionPerformed(ActionEvent event){
@@ -169,9 +160,7 @@ public class keyGUI extends JFrame implements ActionListener{
         displayArea.setText("New trial! Please type a given phrase above");
         KeyList.clear();
         typingArea.requestFocus();
-
     }
-
     private void initialize(){
         this.exported = false;
         num_trial = 0;
@@ -183,7 +172,6 @@ public class keyGUI extends JFrame implements ActionListener{
         displayArea.setText("Hi, please type your designated userID and a given userPW below");
         userID.requestFocus();
     }
-
     private void nextTrial(){
         if (num_trial >= 15){
             displayArea.setText("15 Trials done. Please export the trial");
@@ -195,19 +183,17 @@ public class keyGUI extends JFrame implements ActionListener{
             KeyList = new keyList();
             newTrial();
             trial_Label.setText("Num. of Trial : " + num_trial);
-            pane4.removeAll();
+            chartPane.removeAll();
             chart1 = createChart("Dwell", TrialList, 0);
             chart2 = createChart("Flight", TrialList, 1);
-            pane4.add(chart1);pane4.add(chart2);
-            pane4.revalidate();
+            chartPane.add(chart1);chartPane.add(chart2);
+            chartPane.revalidate();
         }else {
             displayArea.setText("You typed the wrong sentence. Please click new trial to restart typing");
         }
     }
-
     private void export(){
         if (!exported){
-            printResult(TrialList);
             exportUser user = new exportUser();
             if (user.writeCSV(TrialList,userID.getText())){
                 exported = true;
@@ -216,8 +202,7 @@ public class keyGUI extends JFrame implements ActionListener{
             displayArea.setText("You already exported your data!");
         }
     }
-
-    public void printResult(trialList TrialList){
+    /*public void printResult(trialList TrialList){
         System.out.println(String.valueOf(TrialList.getSize()));
         for (int i = 0; i < TrialList.getSize(); i++) {
             keyList key = TrialList.getElement(i);
@@ -226,13 +211,12 @@ public class keyGUI extends JFrame implements ActionListener{
             }
             System.out.println();
         }
-    }
+    }*/
 
-    public void openModel(){
+    private void openModel() {
         model Model = new model();
     }
-
-    public ChartPanel createChart(String chartTitle, trialList trialData, int chartType) {
+    private ChartPanel createChart(String chartTitle, trialList trialData, int chartType) {
         JFreeChart lineChart = ChartFactory.createLineChart(
                 chartTitle,
                 "Character", "Time",
@@ -243,7 +227,6 @@ public class keyGUI extends JFrame implements ActionListener{
         chart.setPreferredSize(new java.awt.Dimension(100, 100));
         return chart;
     }
-
     private DefaultCategoryDataset createDataSet(trialList trialData, int chartType) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -264,11 +247,9 @@ public class keyGUI extends JFrame implements ActionListener{
     public static void main(String[] args){
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch(Exception e){}
-
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         new keyGUI();
-
     }
-
-
 }

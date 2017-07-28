@@ -1,10 +1,9 @@
 package keyInterface;
-
 import java.util.LinkedList;
 
 public class trialList {
 
-    LinkedList<keyList> trials = new LinkedList<keyList>();
+    private LinkedList<keyList> trials = new LinkedList<keyList>();
 
     public void add(keyList key){
         trials.add(key);
