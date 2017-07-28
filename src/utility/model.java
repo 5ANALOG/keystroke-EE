@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,8 @@ public class model implements ActionListener {
     public double[] dwellStd = new double[14];
     public double[] flightMean = new double[13];
     public double[] flightStd = new double[13];
+    int success = 0;
+    int attempt = 0;
 
     public model() {
         frame.setResizable(false);
@@ -114,6 +117,8 @@ public class model implements ActionListener {
         USER = USERLIST.get(userPos);
         textArea.append("Found user : "+UserID);
         int[] arr = new int[N];
+        attempt = 0;
+        success = 0;
         combination(arr,0,N,R,0);
 
     }
@@ -130,57 +135,80 @@ public class model implements ActionListener {
         for (int i = 0; i < length; i++) {
             pickedArray.add(arr[i]);
         }
-        for (int i = 0; i< 15; i++){
+        for (int i = 0; i < 15; i++) {
             boolean flag = false;
-            for (int j = 0; j<10; j++){
+            for (int j = 0; j < 10; j++) {
                 if (pickedArray.get(j) == i) flag = true;
             }
             if (!flag) unpickedArray.add(i);
         }
-        textArea.append("--Picked Array--\n");
+        textArea.append("\n--Picked Array--\n");
         for (Integer aPickedArray : pickedArray) {
             textArea.append(aPickedArray + " ");
         }
-        textArea.append("\n");
-        textArea.append("--Unpicked Array--\n");
-        for (Integer anUnpickedArray : unpickedArray) {
-            textArea.append(anUnpickedArray + " ");
-        }
-        textArea.append("\n");
         calculate();
+        compare();
+        textArea.append("\n");
         pickedArray.clear();
         unpickedArray.clear();
-
     }
     public void calculate(){
         //dwell
-        int total = 0;
+        double total = 0;
         for (int i = 0; i<14; i++){
             for (int j = 0; j<10; j++) {
                 total += USER.dwell[pickedArray.get(j)][i];
             }
             dwellMean[i] = total/10;
+            total=0;
         }
-        int stdTotal = 0;
+        double stdTotal = 0;
         for (int i = 0; i < 14; i++) {
             for (int j = 0; j < 10; j++) {
                 stdTotal += (USER.dwell[pickedArray.get(j)][i] - dwellMean[i]) * (USER.dwell[pickedArray.get(j)][i] - dwellMean[i]);
             }
-            dwellStd[i] = Math.sqrt(stdTotal / 10);
+            dwellStd[i] = Math.sqrt(stdTotal / 9);
+            stdTotal = 0;
         }
-        total = 0;
+
         for (int i = 0; i< 13; i++){
             for (int j = 0; j<10; j++) {
                 total += USER.flight[pickedArray.get(j)][i];
             }
             flightMean[i] = total/10;
+            total=0;
         }
-        stdTotal = 0;
         for (int i = 0; i < 13; i++) {
             for (int j = 0; j < 10; j++) {
                 stdTotal += (USER.flight[pickedArray.get(j)][i] - flightMean[i]) * (USER.flight[pickedArray.get(j)][i] - flightMean[i]);
             }
-            flightStd[i] = Math.sqrt(stdTotal / 10);
+            flightStd[i] = Math.sqrt(stdTotal / 9);
+            stdTotal = 0;
+        }
+    }
+
+    public void compare(){
+        //Dwell FFR
+        int pass = 0;
+        for (int i = 0; i < unpickedArray.size(); i++){
+            pass = 0;
+            for (int j = 0; j < 14; j++){
+                double highest = dwellMean[j]+(dwellStd[j]*STDThreshold);
+                double lowest = dwellMean[j]-(dwellStd[j]*STDThreshold);
+                if (USER.dwell[unpickedArray.get(i)][j] > lowest && USER.dwell[unpickedArray.get(i)][j] < highest){
+                    pass++;
+                }
+            }
+            attempt++;
+            //System.out.println("PASS: " + pass);
+            //System.out.println("ACCEPTANCE: "+ 15*(acceptanceThreshold/100));
+            if (pass >= (15*(acceptanceThreshold/100))){
+                //System.out.println("PASS");
+            }else{
+                success++;
+            }
+            //System.out.println("SUCCESS: "+ success+" ATTEMPT: "+attempt);
+            textArea.append("\n"+unpickedArray.get(i)+ " FFR RATE : "+((double)success/(double)attempt)*100+"%");
         }
     }
 }

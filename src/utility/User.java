@@ -5,7 +5,7 @@ public class User {
     private String userID;
     public int[][] dwell = new int[15][14]; // 15 trials, 14 dwell time each
     public int[][] flight = new int[15][13]; //15 trials, 13 flight time each
-    
+
     public void setuserID(String ID){
         this.userID = ID;
     }
