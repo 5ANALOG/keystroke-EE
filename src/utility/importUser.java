@@ -48,6 +48,8 @@ public class importUser {
                     line = fileReader.readLine();
                     if(line!= null) part = line.split(COMMA);
                 }
+                user.normalizeDwell();
+                user.normalizeFlight();
                 userList.add(user);
             }
         } catch (IOException e1) {

@@ -215,6 +215,7 @@ public class keyGUI extends JFrame implements ActionListener{
 
     private void openModel() {
         model Model = new model();
+        machineL MachineModel = new machineL();
     }
     private ChartPanel createChart(String chartTitle, trialList trialData, int chartType) {
         JFreeChart lineChart = ChartFactory.createLineChart(

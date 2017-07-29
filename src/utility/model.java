@@ -122,7 +122,7 @@ public class model implements ActionListener {
     class ValidateThread implements Runnable {
         public void run() {
             findFRR(TRIAL_NUM,10, nameUserValue.getText());
-            findFAR(TRIAL_NUM,13, nameUserValue.getText());
+            findFAR(TRIAL_NUM,10, nameUserValue.getText());
             printResult(nameUserValue.getText());
         }
     }
@@ -269,11 +269,12 @@ public class model implements ActionListener {
             if (pass < (FLIGHT_NUM * (acceptanceThreshold / 100))) {
                 FRRfail_flight++;
             }
+            /*
             textArea.append("\n" + unpickedArray.get(i) + " DWELL - PASS RATE: "+ Math.round((double)pass/(double)DWELL_NUM*1000d)/10d + "" +
                     "%   FFR RATE : " + Math.round((double)FRRfail_dwell/(double) FRRattempt_dwell*1000d)/10d + "%");
             textArea.append(" | FLIGHT - PASS RATE: "+ Math.round((double)pass/(double)FLIGHT_NUM*1000d)/10d + "" +
                     "%   FFR RATE : " + Math.round((double)FRRfail_flight/(double) FRRattempt_flight*1000d)/10d + "%");
-            textArea.setCaretPosition(textArea.getText().length()-1);
+            textArea.setCaretPosition(textArea.getText().length()-1);*/
         }
     }
     private void calculateFAR(int r){
@@ -312,7 +313,7 @@ public class model implements ActionListener {
         for (int z = 0; z< user_list.size(); z++){
             if (!(user_list.get(z).getuserID()).equals(user.getuserID())) { //Except user itself,
                 compareUser = user_list.get(z);
-                textArea.append("\nCompare with : "+ compareUser.getuserID());
+                //textArea.append("\nCompare with : "+ compareUser.getuserID());
                 for (int i = 0; i < TRIAL_NUM; i++) {
                     int pass = 0;
                     for (int j = 0; j < DWELL_NUM; j++) {
@@ -338,10 +339,11 @@ public class model implements ActionListener {
                     if (pass >= (FLIGHT_NUM * (acceptanceThreshold / 100))) {
                         FARfail_flight++;
                     }
+                    /*
                     textArea.append("\n" + i + " DWELL - PASS RATE: " + Math.round((double) pass / (double) DWELL_NUM * 1000d) / 10d + "" +
                             "%   FAR RATE : " + Math.round((double) FARfail_dwell / (double) FARattempt_dwell * 1000d) / 10d + "%");
                     textArea.append(" | FLIGHT - PASS RATE: " + Math.round((double) pass / (double) FLIGHT_NUM * 1000d) / 10d + "" +
-                            "%   FAR RATE : " + Math.round((double) FARfail_flight / (double) FARattempt_flight * 1000d) / 10d + "%");
+                            "%   FAR RATE : " + Math.round((double) FARfail_flight / (double) FARattempt_flight * 1000d) / 10d + "%");*/
                 }
             }
         }
@@ -367,23 +369,24 @@ public class model implements ActionListener {
                     if (pickedArray.get(j) == i) flag = true;
                 }
                 if (!flag) unpickedArray.add(i);
-            }
+            }/*
             textArea.append("\n----PICKED TRIAL----\n");
             for (Integer aPickedArray : pickedArray) {
                 textArea.append(aPickedArray + " ");
-            }
+            }*/
             calculateFRR(length);
-            textArea.append("\n");
+            //textArea.append("\n");
         }else if (!type){ //FAR
             for (int i = 0; i < length; i++) {
                 pickedArray.add(arr[i]);
             }
+            /*
             textArea.append("\n----PICKED TRIAL----\n");
             for (Integer aPickedArray : pickedArray) {
                 textArea.append(aPickedArray + " ");
-            }
+            }*/
             calculateFAR(length);
-            textArea.append("\n");
+            //textArea.append("\n");
         }
         pickedArray.clear();
         unpickedArray.clear();
