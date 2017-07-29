@@ -24,8 +24,8 @@ public class User {
     }
     public void normalizeDwell(){
         for (int i = 0; i< TRIAL_NUM; i++){
-            double maximum = -999;
-            double minimum = 999;
+            double maximum = -9999;
+            double minimum = 9999;
             for (int r = 0; r< DWELL_NUM; r++) {
                 if (dwell[i][r] > maximum) {
                     maximum = dwell[i][r];
@@ -42,8 +42,8 @@ public class User {
     }
     public void normalizeFlight(){
         for (int i = 0; i< TRIAL_NUM; i++){
-            double maximum = -999;
-            double minimum = 999;
+            double maximum = -9999;
+            double minimum = 9999;
             for (int r = 0; r< FLIGHT_NUM; r++) {
                 if (flight[i][r] > maximum) {
                     maximum = flight[i][r];
