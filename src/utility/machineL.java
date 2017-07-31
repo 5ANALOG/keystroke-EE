@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class machineL implements ActionListener {
+public class machineL extends JPanel implements ActionListener {
     private final int TRIAL_NUM = 15;
     private final int DWELL_NUM = 14;
     private final int FLIGHT_NUM = DWELL_NUM - 1;
@@ -27,27 +27,14 @@ public class machineL implements ActionListener {
     double success = 0;
 
     public machineL() {
-        //Create model Frame
-        JFrame frame = new JFrame("Model");
-        frame.setResizable(false);
-        frame.setSize(900, 600);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-
-        //Create combobox
-        JComboBox combo = new JComboBox();
-        combo.addItem("Statistical analysis");
-        combo.addItem("Machine learning analysis");
-        JButton button1 = new JButton("Go");
-        JPanel topPane = new JPanel(new GridLayout(2, 1));
-        topPane.add(combo);
-        topPane.add(button1);
-        frame.add(topPane, BorderLayout.NORTH);
+        //Create statistics Frame
+        this.setSize(1000, 800);
+        this.setLayout(new BorderLayout());
 
         //Create textArea
         textArea = new JTextArea();
         JScrollPane scrollPane = new JScrollPane(textArea);
-        frame.add(scrollPane, BorderLayout.CENTER);
+        this.add(scrollPane, BorderLayout.CENTER);
 
         JPanel recordPane = new JPanel(new GridLayout(2, 1));
         recordPane.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -77,14 +64,14 @@ public class machineL implements ActionListener {
         recordPane.add(statPane);
         recordPane.add(varPane);
 
-        frame.add(recordPane, BorderLayout.WEST);
+        this.add(recordPane, BorderLayout.WEST);
 
         //Start button
         JButton button2 = new JButton("Start analysis");
         button2.addActionListener(this);
         button2.setActionCommand("start");
-        frame.add(button2, BorderLayout.SOUTH);
-        frame.setVisible(true);
+        this.add(button2, BorderLayout.SOUTH);
+        this.setVisible(true);
     }
 
     @Override

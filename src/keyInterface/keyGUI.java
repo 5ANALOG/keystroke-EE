@@ -11,9 +11,9 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import utility.*;
+import main.panelWizard;
 
 public class keyGUI extends JFrame implements ActionListener{
-
     private keyList KeyList;
     private trialList TrialList;
 
@@ -34,12 +34,15 @@ public class keyGUI extends JFrame implements ActionListener{
 
     private Boolean exported = false;
 
-    private keyGUI(){ //KEY GUI Constructor
+    public keyGUI(){
+
         //Frame information
-        super("Key Collector");
+        super("Keystroke logger - By Shawn Lee");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-        this.setSize(900,600);
+        this.setSize(1000,800);
+
+        Font font = new Font("BM HANNA 11yrs old OTF", Font.BOLD, 15);
 
         //Create KeyList and TrialList object
         KeyList = new keyList();
@@ -48,13 +51,13 @@ public class keyGUI extends JFrame implements ActionListener{
         JPanel recordPane = new JPanel(new GridLayout(1, 2));
         recordPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-
         //Key monitor class implemented inner class.
         KeyAdapter keyMonitor = new KeyAdapter(){
             public void keyPressed(KeyEvent event){
                 int key = event.getKeyCode();
                 if (key == KeyEvent.VK_BACK_SPACE || key == KeyEvent.VK_TAB){
                     event.consume();
+                    displayArea.setForeground(Color.RED);
                     displayArea.setText("Delete key or tab is not accepted in this environment. Click new trial to continue. ");
                 }else if (key == KeyEvent.VK_ENTER){
                     event.consume();
@@ -70,20 +73,23 @@ public class keyGUI extends JFrame implements ActionListener{
                     if (typingArea.getText().equals(input)) {
                         if (KeyList.getSize() != input.length()){
                             event.consume();
+                            displayArea.setForeground(Color.GREEN);
                             displayArea.setText("Press enter");
                         }else{
+                            displayArea.setForeground(Color.GREEN);
                             displayArea.setText("Trial accepted. proceed to the next trial");
                             nextTrial();
                             event.consume();
                         }
                     } else {
+                        displayArea.setForeground(Color.RED);
                         displayArea.setText("You typed the wrong sentence. Proceed to the new trial.");
                         event.consume();
                     }
                 }
                 if (key != KeyEvent.VK_ENTER && key != KeyEvent.VK_BACK_SPACE && key != KeyEvent.VK_TAB) {
                     KeyList.add(0, event.getKeyChar(), event.getKeyCode(), event.getWhen());
-                    System.out.println("Released: "+event.getKeyChar());
+                    //System.out.println("Released: "+event.getKeyChar());
                 }
             }
         };
@@ -95,14 +101,20 @@ public class keyGUI extends JFrame implements ActionListener{
         chartPane.add(chart1);
         chartPane.add(chart2);
 
-
         JPanel loginPane = new JPanel(new GridLayout(10, 1));
         JLabel userID_Label = new JLabel("User ID: ");
+        userID_Label.setFont(font);
         userID = new JTextField(15);
+        userID.setFont(font);
         JLabel fixedPhrase_Label = new JLabel("(User PW) Your password is:  " + input);
+        fixedPhrase_Label.setFont(font);
         trial_Label = new JLabel("Num. of Trial : " + num_trial);
+        trial_Label.setFont(font);
         displayArea = new JLabel("Hi, please type your designated userID and a given userPW below");
+        displayArea.setFont(font);
+
         typingArea = new JTextArea(20,20);
+        typingArea.setFont(font);
         typingArea.setWrapStyleWord(true);
         typingArea.setAutoscrolls(true);
         typingArea.setLineWrap(true);
@@ -115,14 +127,19 @@ public class keyGUI extends JFrame implements ActionListener{
 
         JPanel buttonPane = new JPanel(new FlowLayout());
         clearButton = new JButton("New user");
+        clearButton.setFont(font);
         clearButton.addActionListener(this);
         exportButton = new JButton("Export data");
+        exportButton.setFont(font);
         exportButton.addActionListener(this);
         newTrialButton = new JButton("New trial");
+        newTrialButton.setFont(font);
         newTrialButton.addActionListener(this);
-        submitButton = new JButton("Sign in");
+        submitButton = new JButton("Submit Trial");
+        submitButton.setFont(font);
         submitButton.addActionListener(this);
-        modelButton = new JButton("Model Analysis");
+        modelButton = new JButton("Open Model Analysis");
+        modelButton.setFont(font);
         modelButton.addActionListener(this);
         buttonPane.add(newTrialButton);
         buttonPane.add(clearButton);
@@ -141,7 +158,6 @@ public class keyGUI extends JFrame implements ActionListener{
         //Add keyMonitor listener to typing area
         typingArea.addKeyListener(keyMonitor);
     }
-
     public  void actionPerformed(ActionEvent event){
         if (event.getSource().equals(clearButton)){
             initialize();
@@ -189,33 +205,33 @@ public class keyGUI extends JFrame implements ActionListener{
             chartPane.add(chart1);chartPane.add(chart2);
             chartPane.revalidate();
         }else {
-            displayArea.setText("You typed the wrong sentence. Please click new trial to restart typing");
+            displayArea.setForeground(Color.RED);
+            displayArea.setText("You typed the wrong sentence. Please click new trial button. ");
         }
     }
     private void export(){
+        if (num_trial < 15){
+            displayArea.setForeground(Color.RED);
+            displayArea.setText("Please do 15 trials before export!");
+            return;
+        }
         if (!exported){
             exportUser user = new exportUser();
             if (user.writeCSV(TrialList,userID.getText())){
                 exported = true;
+                displayArea.setForeground(Color.GREEN);
+                displayArea.setText("Succesfully Exported your trials!");
+            }else{
+                displayArea.setForeground(Color.RED);
+                displayArea.setText("Something wrong while exporting trials!");
             }
         }else{
             displayArea.setText("You already exported your data!");
         }
     }
-    /*public void printResult(trialList TrialList){
-        System.out.println(String.valueOf(TrialList.getSize()));
-        for (int i = 0; i < TrialList.getSize(); i++) {
-            keyList key = TrialList.getElement(i);
-            for (int j = 0; j < key.getSize(); j++) {
-                System.out.print(key.getElement(j).getChar());
-            }
-            System.out.println();
-        }
-    }*/
 
     private void openModel() {
-        model Model = new model();
-        machineL MachineModel = new machineL();
+        panelWizard panel = new panelWizard();
     }
     private ChartPanel createChart(String chartTitle, trialList trialData, int chartType) {
         JFreeChart lineChart = ChartFactory.createLineChart(
@@ -244,13 +260,5 @@ public class keyGUI extends JFrame implements ActionListener{
             }
         }
         return dataset;
-    }
-    public static void main(String[] args){
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-        new keyGUI();
     }
 }

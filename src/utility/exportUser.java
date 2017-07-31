@@ -42,9 +42,7 @@ public class exportUser {
                 }
                 fileWriter.append(NEW_LINE);
             }
-            System.out.println("CSV file written");
         } catch (IOException e) {
-            System.out.println("CSV FILE NOT WRITTEN");
             System.out.print(e);
             return false;
         } finally {
