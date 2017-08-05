@@ -75,7 +75,7 @@ public class mlGUI extends JPanel implements ActionListener {
         this.add(recordPane, BorderLayout.WEST);
 
         //Start button
-        JButton button2 = new JButton("Start analysis");
+        JButton button2 = new JButton("Start simulation");
         button2.addActionListener(this);
         button2.setActionCommand("start");
         this.add(button2, BorderLayout.SOUTH);

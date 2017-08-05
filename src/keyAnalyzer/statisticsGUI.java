@@ -103,7 +103,7 @@ public class statisticsGUI extends JPanel implements ActionListener {
         this.add(recordPane, BorderLayout.WEST);
 
         //Start button
-        JButton button2 = new JButton("Start analysis");
+        JButton button2 = new JButton("Start simulation");
         button2.addActionListener(this);
         button2.setActionCommand("start");
         this.add(button2, BorderLayout.SOUTH);
@@ -140,19 +140,23 @@ public class statisticsGUI extends JPanel implements ActionListener {
             textArea.append("\n##### SEARCHING IN PROGRESS... #####\n");
             if (findMinimum) {
                 double minimum = 9999;
-                for (int n = 1; n <= 100; n++) {
+                double minimumDist = 9999;
+                for (int n = 0; n <= 80; n++) {
                     double i =  (double)n/10;
                     for (int r = 0; r <= 100; r+=5) {
                         STDThreshold = i;
                         acceptanceThreshold = r;
-                        findFRR(TRIAL_NUM, 10, nameUserValue.getText());
-                        findFAR(TRIAL_NUM, 10, nameUserValue.getText());
-                        if (Math.abs(((double)FARfail/(double)FARattempt)+((double)FRRfail/(double)FRRattempt)) < minimum){
-                            minimum_acceptance = acceptanceThreshold;
-                            minimum_STD = STDThreshold;
-                            minimumFAR = (double)FARfail/(double)FARattempt;
-                            minimumFRR = (double)FRRfail/(double)FRRattempt;
-                            minimum = Math.abs(((double)FARfail/(double)FARattempt)+((double)FRRfail/(double)FRRattempt));
+                        findFRR(TRIAL_NUM, COMBINATION_NUM, nameUserValue.getText());
+                        findFAR(TRIAL_NUM, COMBINATION_NUM, nameUserValue.getText());
+                        if (Math.abs(((double)FARfail/(double)FARattempt)+((double)FRRfail/(double)FRRattempt)) < minimum) {
+                            if (Math.abs(((double)FARfail/(double)FARattempt)-((double)FRRfail/(double)FRRattempt)) < minimumDist){
+                                minimum_acceptance = acceptanceThreshold;
+                                minimum_STD = STDThreshold;
+                                minimumFAR = (double) FARfail / (double) FARattempt;
+                                minimumFRR = (double) FRRfail / (double) FRRattempt;
+                                minimum = Math.abs(((double) FARfail / (double) FARattempt)+((double) FRRfail / (double) FRRattempt));
+                                minimumDist = Math.abs(((double)FARfail/(double)FARattempt)-((double)FRRfail/(double)FRRattempt));
+                            }
                         }
                         FRRattempt = 0;
                         FRRfail = 0;
@@ -167,6 +171,9 @@ public class statisticsGUI extends JPanel implements ActionListener {
                 textArea.append("Acceptance threshold: " + minimum_acceptance + "\n");
                 textArea.append("Minimum FRR: " + minimumFRR*100 + "%\n");
                 textArea.append("Minimum FAR: " + minimumFAR*100 + "%\n");
+                textArea.append("Equal error rate (ERR): " + (minimumFAR+minimumFRR)/2*100 + "%\n");
+
+
                 textArea.setCaretPosition(textArea.getText().length() - 1);
             } else {
                 initialize();
@@ -186,6 +193,10 @@ public class statisticsGUI extends JPanel implements ActionListener {
         FRRfail = 0;
         FARattempt = 0;
         FARfail = 0;
+        minimum_acceptance = 0;
+        minimum_STD = 0;
+        minimumFRR = 0;
+        minimumFAR = 0;
     }
     private void printResult(String userId){
         textArea.append("\n----- SIMULATION RESULT -----\n");
@@ -215,7 +226,7 @@ public class statisticsGUI extends JPanel implements ActionListener {
             }
         }
         if (!flag) {
-            textArea.append("Couldn't find the user: "+ UserID+"\n");
+            if (!findMinimum) textArea.append("Couldn't find the user: "+ UserID+"\n");
             return;
         }
         if (!findMinimum)textArea.append("-----FALSE REJECTION SIMULATION STARTED-----\n");
@@ -242,7 +253,7 @@ public class statisticsGUI extends JPanel implements ActionListener {
             }
         }
         if (!flag) {
-            textArea.append("Couldn't find the user: "+ UserID+"\n");
+            if (!findMinimum) textArea.append("Couldn't find the user: "+ UserID+"\n");
             return;
         }
         if (!findMinimum) textArea.append("-----FALSE ACCEPTANCE SIMULATION STARTED-----\n");
@@ -288,17 +299,13 @@ public class statisticsGUI extends JPanel implements ActionListener {
         for (Integer anUnpickedArray : unpickedArray) {
             int dwell_pass = 0;
             for (int j = 0; j < DWELL_NUM; j++) {
-                double highest = dwellMean[j] + (dwellStd[j] * STDThreshold);
-                double lowest = dwellMean[j] - (dwellStd[j] * STDThreshold);
-                if (user.dwell[anUnpickedArray][j] >= lowest && user.dwell[anUnpickedArray][j] <= highest) {
+                if (Math.abs(user.dwell[anUnpickedArray][j]-dwellMean[j]) <= dwellStd[j]*STDThreshold) {
                     dwell_pass++;
                 }
             }
             int flight_pass = 0;
             for (int j = 0; j < FLIGHT_NUM; j++) {
-                double highest = flightMean[j] + (flightStd[j] * STDThreshold);
-                double lowest = flightMean[j] - (flightStd[j] * STDThreshold);
-                if (user.flight[anUnpickedArray][j] >= lowest && user.flight[anUnpickedArray][j] <= highest) {
+                if (Math.abs(user.flight[anUnpickedArray][j] -flightMean[j]) <= flightStd[j]*STDThreshold) {
                     flight_pass++;
                 }
             }
@@ -352,17 +359,13 @@ public class statisticsGUI extends JPanel implements ActionListener {
                 for (int i = 0; i < TRIAL_NUM; i++) {
                     int dwell_pass = 0;
                     for (int j = 0; j < DWELL_NUM; j++) {
-                        double highest = dwellMean[j] + (dwellStd[j] * STDThreshold);
-                        double lowest = dwellMean[j] - (dwellStd[j] * STDThreshold);
-                        if (compareUser.dwell[i][j] >= lowest && compareUser.dwell[i][j] <= highest) {
+                        if (Math.abs(compareUser.dwell[i][j]-dwellMean[j]) <= dwellStd[j]*STDThreshold) {
                             dwell_pass++;
                         }
                     }
                     int flight_pass = 0;
                     for (int j = 0; j < FLIGHT_NUM; j++) {
-                        double highest = flightMean[j] + (flightStd[j] * STDThreshold);
-                        double lowest = flightMean[j] - (flightStd[j] * STDThreshold);
-                        if (compareUser.flight[i][j] >= lowest && compareUser.flight[i][j] <= highest) {
+                        if (Math.abs(compareUser.flight[i][j]-flightMean[j]) <= flightStd[j]*STDThreshold) {
                             flight_pass++;
                         }
                     }

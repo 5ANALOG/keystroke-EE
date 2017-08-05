@@ -19,7 +19,7 @@ public class panelWizard extends JFrame implements ActionListener {
 
     public panelWizard(){
         //Create panel card
-        super("Keystroke model analyzer by Shawn Lee");
+        super("Keystroke simulator by Shawn Lee");
         this.setSize(800,600);
         this.setResizable(false);
 

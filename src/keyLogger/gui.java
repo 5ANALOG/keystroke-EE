@@ -37,7 +37,6 @@ public class gui extends JFrame implements ActionListener{
     private Boolean exported = false;
 
     public gui(){
-
         //Frame information
         super("Keystroke logger By Shawn Lee");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -135,7 +134,7 @@ public class gui extends JFrame implements ActionListener{
 
 
         JPanel buttonPane = new JPanel(new FlowLayout());
-        buttonPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         clearButton = new JButton("New user");
         clearButton.setFont(font);
         clearButton.addActionListener(this);
