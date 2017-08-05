@@ -1,12 +1,12 @@
-package utility;
+package keyAnalyzer;
 
 
-public class User {
+class user {
     private final int TRIAL_NUM = 15;
     private final int DWELL_NUM = 14;
     private final int FLIGHT_NUM = DWELL_NUM-1;
     private String userID;
-    private Boolean normalized = false;
+
     public double[][] dwell = new double[TRIAL_NUM][DWELL_NUM]; // 15 trials, 14 dwell time each
     public double[][] flight = new double[TRIAL_NUM][FLIGHT_NUM]; //15 trials, 13 flight time each
 
@@ -38,7 +38,6 @@ public class User {
                 dwell[i][r] = (dwell[i][r]-minimum)/(maximum-minimum);
             }
         }
-        normalized = true;
     }
     public void normalizeFlight(){
         for (int i = 0; i< TRIAL_NUM; i++){
@@ -56,7 +55,6 @@ public class User {
                 flight[i][r] = (flight[i][r]-minimum)/(maximum-minimum);
             }
         }
-        normalized = true;
     }
 }
 

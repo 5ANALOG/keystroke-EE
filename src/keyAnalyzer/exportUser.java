@@ -1,7 +1,7 @@
-package utility;
+package keyAnalyzer;
 
-import keyInterface.trialList;
-import keyInterface.keyList;
+import keyLogger.trialList;
+import keyLogger.keyList;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class exportUser {
                 fileWriter.append(NEW_LINE);
             }
         } catch (IOException e) {
-            System.out.print(e);
+            e.printStackTrace();
             return false;
         } finally {
             try {

@@ -1,9 +1,9 @@
-package keyInterface;
+package keyLogger;
 import java.util.LinkedList;
 
 public class trialList {
 
-    private LinkedList<keyList> trials = new LinkedList<keyList>();
+    private LinkedList<keyList> trials = new LinkedList<>();
 
     public void add(keyList key){
         trials.add(key);

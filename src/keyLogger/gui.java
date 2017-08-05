@@ -1,4 +1,4 @@
-package keyInterface;
+package keyLogger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,13 +7,15 @@ import java.awt.event.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import utility.*;
+import keyAnalyzer.*;
 import main.panelWizard;
 
-public class keyGUI extends JFrame implements ActionListener{
+public class gui extends JFrame implements ActionListener{
     private keyList KeyList;
     private trialList TrialList;
 
@@ -34,15 +36,15 @@ public class keyGUI extends JFrame implements ActionListener{
 
     private Boolean exported = false;
 
-    public keyGUI(){
+    public gui(){
 
         //Frame information
-        super("Keystroke logger - By Shawn Lee");
+        super("Keystroke logger By Shawn Lee");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setSize(1000,800);
 
-        Font font = new Font("BM HANNA 11yrs old OTF", Font.BOLD, 15);
+        Font font = new Font("Open Sans", Font.BOLD, 15);
 
         //Create KeyList and TrialList object
         KeyList = new keyList();
@@ -58,7 +60,7 @@ public class keyGUI extends JFrame implements ActionListener{
                 if (key == KeyEvent.VK_BACK_SPACE || key == KeyEvent.VK_TAB){
                     event.consume();
                     displayArea.setForeground(Color.RED);
-                    displayArea.setText("Delete key or tab is not accepted in this environment. Click new trial to continue. ");
+                    displayArea.setText("Delete key or tab is not accepted in this environment.");
                 }else if (key == KeyEvent.VK_ENTER){
                     event.consume();
                 }
@@ -73,10 +75,10 @@ public class keyGUI extends JFrame implements ActionListener{
                     if (typingArea.getText().equals(input)) {
                         if (KeyList.getSize() != input.length()){
                             event.consume();
-                            displayArea.setForeground(Color.GREEN);
+                            displayArea.setForeground(Color.BLUE);
                             displayArea.setText("Press enter");
                         }else{
-                            displayArea.setForeground(Color.GREEN);
+                            displayArea.setForeground(Color.BLUE);
                             displayArea.setText("Trial accepted. proceed to the next trial");
                             nextTrial();
                             event.consume();
@@ -101,17 +103,22 @@ public class keyGUI extends JFrame implements ActionListener{
         chartPane.add(chart1);
         chartPane.add(chart2);
 
-        JPanel loginPane = new JPanel(new GridLayout(10, 1));
-        JLabel userID_Label = new JLabel("User ID: ");
+        JPanel loginPane = new JPanel(new GridLayout(9, 1));
+        JLabel userID_Label = new JLabel("user ID: ");
         userID_Label.setFont(font);
         userID = new JTextField(15);
         userID.setFont(font);
-        JLabel fixedPhrase_Label = new JLabel("(User PW) Your password is:  " + input);
+        JLabel fixedPhrase_Label = new JLabel("user PW - Your designated password is:");
         fixedPhrase_Label.setFont(font);
+        JLabel fixedPhrase_LABEL = new JLabel(input,  SwingConstants.CENTER);
+        font = new Font("Open Sans", Font.BOLD, 25);
+        fixedPhrase_LABEL.setFont(font);
+        font = new Font("Open Sans", Font.BOLD, 15);
         trial_Label = new JLabel("Num. of Trial : " + num_trial);
         trial_Label.setFont(font);
-        displayArea = new JLabel("Hi, please type your designated userID and a given userPW below");
-        displayArea.setFont(font);
+        displayArea= new JLabel("");
+        Font displayFont = new Font("Open Sans", Font.BOLD, 16);
+        displayArea.setFont(displayFont);
 
         typingArea = new JTextArea(20,20);
         typingArea.setFont(font);
@@ -122,10 +129,13 @@ public class keyGUI extends JFrame implements ActionListener{
         loginPane.add(userID_Label);
         loginPane.add(userID);
         loginPane.add(fixedPhrase_Label);
+        loginPane.add(fixedPhrase_LABEL);
         loginPane.add(typingArea);
+        loginPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
 
         JPanel buttonPane = new JPanel(new FlowLayout());
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         clearButton = new JButton("New user");
         clearButton.setFont(font);
         clearButton.addActionListener(this);
@@ -152,11 +162,13 @@ public class keyGUI extends JFrame implements ActionListener{
         loginPane.add(buttonPane);
         recordPane.add(loginPane);
         recordPane.add(chartPane);
+
         this.add(recordPane);
         this.setVisible(true);
 
         //Add keyMonitor listener to typing area
         typingArea.addKeyListener(keyMonitor);
+        initialize();
     }
     public  void actionPerformed(ActionEvent event){
         if (event.getSource().equals(clearButton)){
@@ -185,12 +197,12 @@ public class keyGUI extends JFrame implements ActionListener{
         typingArea.setText("");
         TrialList.clear();
         KeyList.clear();
-        displayArea.setText("Hi, please type your designated userID and a given userPW below");
+        displayArea.setText("Hi, please type your own ID and given password below");
         userID.requestFocus();
     }
     private void nextTrial(){
         if (num_trial >= 15){
-            displayArea.setText("15 Trials done. Please export the trial");
+            displayArea.setText("You've done 15 Trials . Please export the trials!");
             return;
         }
         if (typingArea.getText().equals(input)) {
@@ -206,30 +218,29 @@ public class keyGUI extends JFrame implements ActionListener{
             chartPane.revalidate();
         }else {
             displayArea.setForeground(Color.RED);
-            displayArea.setText("You typed the wrong sentence. Please click new trial button. ");
+            displayArea.setText("You typed the wrong sentence. Click New Trial. ");
         }
     }
     private void export(){
         if (num_trial < 15){
             displayArea.setForeground(Color.RED);
-            displayArea.setText("Please do 15 trials before export!");
+            displayArea.setText("Please do 15 trials before the export!");
             return;
         }
         if (!exported){
             exportUser user = new exportUser();
             if (user.writeCSV(TrialList,userID.getText())){
                 exported = true;
-                displayArea.setForeground(Color.GREEN);
-                displayArea.setText("Succesfully Exported your trials!");
+                displayArea.setForeground(Color.BLUE);
+                displayArea.setText("Successfully Exported your trials!");
             }else{
                 displayArea.setForeground(Color.RED);
                 displayArea.setText("Something wrong while exporting trials!");
             }
         }else{
-            displayArea.setText("You already exported your data!");
+            displayArea.setText("You already exported your trials!");
         }
     }
-
     private void openModel() {
         panelWizard panel = new panelWizard();
     }
@@ -240,8 +251,20 @@ public class keyGUI extends JFrame implements ActionListener{
                 createDataSet(trialData, chartType),
                 PlotOrientation.VERTICAL,
                 true, true, false);
+        CategoryPlot plot = (CategoryPlot) lineChart.getPlot();
         ChartPanel chart = new ChartPanel(lineChart);
         chart.setPreferredSize(new java.awt.Dimension(100, 100));
+        LineAndShapeRenderer renderer = new LineAndShapeRenderer();
+        renderer.setSeriesStroke(0,new BasicStroke(2.0f));
+        renderer.setBaseShapesVisible(true);
+        renderer.setBaseShapesFilled(true);
+        plot.setRangeGridlinesVisible(true);
+        plot.setRangeGridlinePaint(Color.BLACK);
+        plot.setDomainGridlinesVisible(true);
+        plot.setDomainGridlinePaint(Color.BLACK);
+        plot.setRenderer(renderer);
+        lineChart.setBorderVisible(true);
+        lineChart.setBorderPaint(Color.BLACK);
         return chart;
     }
     private DefaultCategoryDataset createDataSet(trialList trialData, int chartType) {

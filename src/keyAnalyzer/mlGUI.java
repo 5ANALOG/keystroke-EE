@@ -1,4 +1,4 @@
-package utility;
+package keyAnalyzer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -8,59 +8,67 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class machineL extends JPanel implements ActionListener {
+public class mlGUI extends JPanel implements ActionListener {
     private final int TRIAL_NUM = 15;
     private final int DWELL_NUM = 14;
     private final int FLIGHT_NUM = DWELL_NUM - 1;
-    private importUser userList = new importUser();
-    private ArrayList<User> user_list = userList.getuserList();
+    private importUser userList;
+    private ArrayList<user> user_list;
+
     private JTextArea textArea;
     private JTextField kValue, bValue;
+    private JCheckBox normalizeCheck;
 
-    double[][] totalScore = new double[user_list.size()][TRIAL_NUM];
+    private double[][] totalScore;
 
-    int varK = 1;
-    double varB = 1;
+    private int varK = 1;
+    private double varB = 1;
 
-    double attempt = 0;
-    double success = 0;
+    private double attempt = 0;
+    private double success = 0;
 
-    public machineL() {
-        //Create statistics Frame
-        this.setSize(1000, 800);
+    public mlGUI() {
+        userList = new importUser(false);
+        user_list = userList.getuserList();
+        //Create statisticsGUI Frame
+        this.setSize(800, 600);
         this.setLayout(new BorderLayout());
 
         //Create textArea
         textArea = new JTextArea();
+        textArea.setFont(new Font("Open Sans", Font.BOLD, 13));
         JScrollPane scrollPane = new JScrollPane(textArea);
         this.add(scrollPane, BorderLayout.CENTER);
 
         JPanel recordPane = new JPanel(new GridLayout(2, 1));
         recordPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-        JPanel statPane = new JPanel(new GridLayout(2, 2));
-        TitledBorder statTab = new TitledBorder(new LineBorder(Color.black), "Trial Status");
+        JPanel statPane = new JPanel(new GridLayout(2, 1));
+        TitledBorder statTab = new TitledBorder(new LineBorder(Color.black), "Simulation Status");
         statPane.setBorder(statTab);
-        JLabel numUserLabel = new JLabel("Number of users:");
-        JLabel numTrialLabel = new JLabel("Number of Trials:");
-        JLabel numUserValue = new JLabel(String.valueOf(userList.getuserList().size()));
-        JLabel numTrialValue = new JLabel("15");
+        JLabel numUserLabel = new JLabel(" Number of users: "+ String.valueOf(userList.getuserList().size()));
+        JLabel numTrialLabel = new JLabel(" Number of Trials: "+ TRIAL_NUM);
         statPane.add(numUserLabel);
-        statPane.add(numUserValue);
         statPane.add(numTrialLabel);
-        statPane.add(numTrialValue);
 
-        JPanel varPane = new JPanel(new GridLayout(2, 2));
-        TitledBorder varTab = new TitledBorder(new LineBorder(Color.black), "Variable to test");
+        JPanel varPane = new JPanel(new GridLayout(3, 2));
+        varPane.setPreferredSize(new Dimension(250, 200));
+        TitledBorder varTab = new TitledBorder(new LineBorder(Color.black), "Variables Setting");
         varPane.setBorder(varTab);
-        JLabel kValueLabel = new JLabel("K - Value: ");
-        JLabel BValueLabel = new JLabel("B - Value: ");
+        JLabel normalizeLabel = new JLabel(" RESCALE: ");
+        JLabel kValueLabel = new JLabel(" K VALUE: ");
+        JLabel BValueLabel = new JLabel(" B VALUE: ");
+        normalizeCheck = new JCheckBox();
         kValue = new JTextField();
         bValue = new JTextField();
+        varPane.add(normalizeLabel);
+        varPane.add(normalizeCheck);
         varPane.add(kValueLabel);
         varPane.add(kValue);
         varPane.add(BValueLabel);
         varPane.add(bValue);
+
         recordPane.add(statPane);
         recordPane.add(varPane);
 
@@ -76,22 +84,34 @@ public class machineL extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand() == "start") {
-            varK = Integer.parseInt(kValue.getText());
-            varB = Double.parseDouble(bValue.getText());
-            Runnable runnable = new utility.machineL.ValidateThread();
+        if (Objects.equals(e.getActionCommand(), "start")) {
+            if (normalizeCheck.isSelected()){
+                userList = new importUser(true);
+            }else{
+                userList = new importUser(false);
+            }
+            user_list = userList.getuserList();
+            try{
+                varK = Integer.parseInt(kValue.getText());
+                varB = Double.parseDouble(bValue.getText());
+            }catch (NumberFormatException error){
+                error.printStackTrace();
+                textArea.append("\n ### Error Occurred. Please Enter appropriate values in the variable ###");
+                return;
+            }
+            Runnable runnable = new mlGUI.ValidateThread();
             Thread thread = new Thread(runnable);
             thread.start();
         }
     }
-    public void initialize() {
+    private void initialize() {
         textArea.setText("");
-        textArea.append("----Raw data status----\n");
+        textArea.append("----- VARIABLE SETTING STATUS -----\n");
         textArea.append("K - value: " +varK + "\n");
-        textArea.append("P - vaulue " + varB + "%\n");
-        textArea.append("-----------------------\n");
+        textArea.append("P - value: " + varB + "%\n");
         attempt = 0;
         success = 0;
+        totalScore = new double[user_list.size()][TRIAL_NUM];
     }
     class ValidateThread implements Runnable {
         public void run() {
@@ -100,18 +120,19 @@ public class machineL extends JPanel implements ActionListener {
             printResult();
         }
     }
-    public void KNN(){
-        User headUser = new User();
-        for (int i = 0; i <user_list.size(); i++){
-            headUser = user_list.get(i);
-            compare(headUser,i);
+    private void KNN(){
+        new user();
+        user headUser;
+        for (user anUser_list : user_list) {
+            headUser = anUser_list;
+            compare(headUser);
         }
     }
-    public void compare(User head, int userIndex){
+    private void compare(user head){
         for (int i = 0; i < TRIAL_NUM; i++){
-            textArea.append("-------------------\n");
+            //textArea.append("-------------------\n");
             for (int u = 0; u<user_list.size(); u++){
-                User tail = user_list.get(u);
+                user tail = user_list.get(u);
                 for (int j = 0; j <TRIAL_NUM; j++) {
                     double dwellScore = 0;
                     double flightScore = 0;
@@ -122,14 +143,14 @@ public class machineL extends JPanel implements ActionListener {
                         flightScore += Math.abs(head.flight[i][c]-tail.flight[j][c]);
                     }
                     totalScore[u][j] = varB*(dwellScore)+(1-varB)*flightScore;
-                    if (head.equals(tail) && i == j) totalScore[u][j] = 99999;
-                    textArea.append(head.getuserID() + " " + tail.getuserID() +" Trial: "+i+ " "+j+" Score: " + totalScore[u][j]+ "\n");
+                    if (head.equals(tail) && i == j) totalScore[u][j] = -2;
+                    //textArea.append(head.getuserID() + " " + tail.getuserID() +" Trial: "+i+ " "+j+" Score: " + totalScore[u][j]+ "\n");
                 }
             }
             kNearest(head,varK);
         }
     }
-    public void kNearest(User head,int k){
+    private void kNearest(user head, int k){
         int[] nearest = new int[user_list.size()];
         double superSmallest = -1;
         for (int i = 0; i < k; i++){
@@ -168,17 +189,15 @@ public class machineL extends JPanel implements ActionListener {
             if(head.getuserID().equals(user_list.get(biggestPos).getuserID())){
                 success++;
             }
-            textArea.append("Actual user: "+head.getuserID()+" | Machine predict: "+user_list.get(biggestPos).getuserID()+" with K value of "+ k+"\n");
+            textArea.append("ACTUAL USER: "+head.getuserID()+" | MACHINE PREDICT: "+user_list.get(biggestPos).getuserID()+" WITH K VALUE OF "+ k+"\n");
         }
     }
-    public void printResult(){
-        textArea.append("\n----RESULT----\n");
+    private void printResult(){
+        textArea.append("\n----- SIMULATION RESULT -----\n");
         textArea.append("Total No. Attempt: "+ attempt+ "\n");
         textArea.append("Total No. Success: "+ success+ "\n");
         textArea.append("Total No. Failure: "+ (attempt-success)+ "\n");
         textArea.append("Accuracy rate: "+ (success/attempt)*100+ "%\n");
-
-        textArea.append("----------------\n");
         textArea.setCaretPosition(textArea.getText().length()-1);
     }
 }
