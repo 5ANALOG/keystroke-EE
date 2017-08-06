@@ -140,22 +140,20 @@ public class statisticsGUI extends JPanel implements ActionListener {
             textArea.append("\n##### SEARCHING IN PROGRESS... #####\n");
             if (findMinimum) {
                 double minimum = 9999;
-                double minimumDist = 9999;
-                for (int n = 0; n <= 80; n++) {
-                    double i =  (double)n/10;
+                for (int n = 0; n <= 120; n++) {
+                    double i =  (double)n/20;
                     for (int r = 0; r <= 100; r+=5) {
                         STDThreshold = i;
                         acceptanceThreshold = r;
                         findFRR(TRIAL_NUM, COMBINATION_NUM, nameUserValue.getText());
                         findFAR(TRIAL_NUM, COMBINATION_NUM, nameUserValue.getText());
-                        if (Math.abs(((double)FARfail/(double)FARattempt)+((double)FRRfail/(double)FRRattempt)) < minimum) {
-                            if (Math.abs(((double)FARfail/(double)FARattempt)-((double)FRRfail/(double)FRRattempt)) < minimumDist){
+                        if (Math.abs(((double)FARfail/(double)FARattempt)-((double)FRRfail/(double)FRRattempt)) <= 0.1) {
+                            if (Math.abs(((double) FARfail / (double) FARattempt) + ((double) FRRfail / (double) FRRattempt)) < minimum) {
                                 minimum_acceptance = acceptanceThreshold;
                                 minimum_STD = STDThreshold;
                                 minimumFAR = (double) FARfail / (double) FARattempt;
                                 minimumFRR = (double) FRRfail / (double) FRRattempt;
-                                minimum = Math.abs(((double) FARfail / (double) FARattempt)+((double) FRRfail / (double) FRRattempt));
-                                minimumDist = Math.abs(((double)FARfail/(double)FARattempt)-((double)FRRfail/(double)FRRattempt));
+                                minimum = Math.abs(((double) FARfail / (double) FARattempt) + ((double) FRRfail / (double) FRRattempt));
                             }
                         }
                         FRRattempt = 0;
@@ -172,8 +170,6 @@ public class statisticsGUI extends JPanel implements ActionListener {
                 textArea.append("Minimum FRR: " + minimumFRR*100 + "%\n");
                 textArea.append("Minimum FAR: " + minimumFAR*100 + "%\n");
                 textArea.append("Equal error rate (ERR): " + (minimumFAR+minimumFRR)/2*100 + "%\n");
-
-
                 textArea.setCaretPosition(textArea.getText().length() - 1);
             } else {
                 initialize();
